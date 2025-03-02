@@ -210,7 +210,14 @@ nav.navbar.bootsnav .navbar-toggle i{color: #d92cf9;}
     color: #fff;
     font-size: 54px;
     font-weight: 700;
-    text-transform: uppercase;
+    text-transform: none;
+    line-height: 1.5;
+}
+.header-text h3 {
+    color: #89b2e9;
+    font-size: 50px;
+    font-weight: 700;
+    text-transform: none;
     line-height: 1.5;
 }
 .header-text h2 span {color: #d92cf9;}
@@ -666,24 +673,6 @@ span.single-timeline-horizontal.spacial-horizontal-line {width: 88px;}
     transform:scale(1);
     top:0;
 }/*.isotope-overlay*/
-
-/*-------------------------------------
-        10. Clients
---------------------------------------*/
-.clients {padding-top: 50px;}
-.clients-area {
-    display: flex;
-    align-items: center;
-    height: 250px;
-}
-.clients-area .item {padding: 0 25px;}
-
-.clients .clients-area .owl-carousel .owl-item img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius:0;
-}
 
 /*-------------------------------------
         11. Contact
