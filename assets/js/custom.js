@@ -42,13 +42,21 @@ $(document).ready(function(){
 		
 		//=============
 
-		$('li.smooth-menu a').bind("click", function(event) {
-			event.preventDefault();
-			var anchor = $(this);
-			$('html, body').stop().animate({
-				scrollTop: $(anchor.attr('href')).offset().top - 0
-			}, 1200,'easeInOutExpo');
-		});
+		$('.smooth-menu a').on('click', function(e) {
+
+    var href = $(this).attr('href');
+
+    // Allow normal navigation for external pages
+    if (!href.startsWith('#')) {
+        return;
+    }
+
+    e.preventDefault();
+
+    $('html, body').stop().animate({
+        scrollTop: $(href).offset().top
+    }, 1200);
+	});
 		
 		$('body').scrollspy({
 			target:'.navbar-collapse',
