@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aryan Rai - Resume Presentation Video</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Video Slide transitions */
+        .slide-container {
+            perspective: 1200px;
+        }
+
+        .slide {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: scale(0.95) translateZ(-50px);
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateZ(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .slide.exit {
+            opacity: 0;
+            transform: scale(1.05) translateZ(50px);
+            z-index: 0;
+        }
+
+        /* Glassmorphism styling */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px rgba(255, 255, 255, 0.08) solid;
+        }
+
+        /* Pulsing Glow effects */
+        .glow-cyan {
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.15);
+        }
+        .glow-green {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Interactive Background Network Canvas -->
+    <canvas id="networkCanvas" class="fixed inset-0 w-full h-full pointer-events-none opacity-20 z-0"></canvas>
+
+    <!-- Header / Navbar -->
+    <header class="relative z-20 px-6 py-4 border-b border-slate-800/60 glass-panel flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-green-500 flex items-center justify-center text-white font-bold mono shadow-lg shadow-cyan-500/20">
+                AR
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                    Aryan Rai <span class="text-xs font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded ml-2 border border-cyan-800">127.0.0.1</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">IT Infrastructure & Network Security Engineer</p>
+            </div>
+        </div>
+
+        <!-- Synthesizer Controls -->
+        <div class="flex items-center space-x-4 bg-slate-900/90 border border-slate-800 px-4 py-2 rounded-xl">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 font-mono flex items-center gap-1">
+                    <i data-lucide="music" class="w-3 h-3 text-cyan-400"></i> Ambient Instrumental Synth
+                </span>
+                <span id="synthStatusText" class="text-xs font-bold text-slate-500 font-mono">Audio Stopped</span>
+            </div>
+            <button id="toggleSynthBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow-md shadow-cyan-900/30">
+                <span id="toggleSynthIconContainer"><i data-lucide="play" class="w-3.5 h-3.5"></i></span>
+                <span id="toggleSynthText">Play Music</span>
+            </button>
+            <div class="flex items-center gap-2 border-l border-slate-800 pl-3">
+                <i data-lucide="volume-2" class="w-4 h-4 text-slate-400"></i>
+                <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="0.4" class="w-16 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Video Player Space -->
+    <main class="relative z-10 flex-grow flex items-center justify-center p-4 md:p-8 max-w-7xl mx-auto w-full">
+        
+        <div class="w-full grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+            
+            <!-- Left Sidebar: Playlist / Sections Selector -->
+            <div class="lg:col-span-1 flex flex-col justify-between p-4 rounded-2xl glass-panel border border-slate-800/80">
+                <div>
+                    <h3 class="text-xs font-mono text-cyan-400 uppercase tracking-widest mb-3">Resume Scenes</h3>
+                    <div class="space-y-2" id="playlistContainer">
+                        <!-- Dynamic Playlists Added here -->
+                    </div>
+                </div>
+                
+                <!-- Live Audio Visualizer Canvas -->
+                <div class="mt-6 border border-slate-800/80 rounded-xl p-3 bg-slate-950/50">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                            <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-ping"></span> Real-time Spectrum
+                        </span>
+                        <span class="text-[9px] font-mono text-slate-500">Web Audio API</span>
+                    </div>
+                    <canvas id="visualizerCanvas" class="w-full h-12 bg-slate-900/30 rounded"></canvas>
+                </div>
+            </div>
+
+            <!-- Video Screen Viewport -->
+            <div class="lg:col-span-3 flex flex-col relative rounded-2xl overflow-hidden glass-panel border-2 border-slate-800/90 glow-cyan">
+                
+                <!-- Screen Frame Decorators -->
+                <div class="absolute top-3 left-3 z-30 flex items-center gap-1.5 font-mono text-xs text-slate-500 bg-slate-950/80 px-2 py-1 rounded border border-slate-800">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span>REC</span>
+                    <span class="text-slate-600">|</span>
+                    <span id="videoDurationTimer">00:00</span>
+                </div>
+
+                <div class="absolute top-3 right-3 z-30 font-mono text-[10px] text-cyan-400 bg-slate-950/80 px-2 py-1 rounded border border-cyan-900/60 flex items-center gap-1">
+                    <i data-lucide="cpu" class="w-3 h-3"></i> Auto-Play Active
+                </div>
+
+                <!-- Slide Window / Viewport -->
+                <div class="relative flex-grow h-[460px] md:h-[520px] bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-6 md:p-10 overflow-hidden slide-container">
+                    
+                    <!-- SLIDE 1: Title & Hero Profile -->
+                    <div class="slide active flex flex-col justify-center" data-duration="9">
+                        <div class="max-w-xl mx-auto text-center space-y-6">
+                            <div class="inline-block py-1 px-3 rounded-full bg-slate-900/80 border border-cyan-800 text-xs font-mono text-cyan-400 uppercase tracking-widest glow-cyan">
+                                Hostname: 127.0.0.1
+                            </div>
+                            <h2 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-none">
+                                Aryan Rai
+                            </h2>
+                            <p class="text-xl text-cyan-300 font-medium">
+                                Network & IT Infrastructure Security Engineer
+                            </p>
+                            <div class="h-1 w-20 bg-gradient-to-r from-cyan-500 to-green-500 mx-auto rounded-full"></div>
+                            <p class="text-slate-400 text-sm max-w-lg mx-auto">
+                                Result-driven IT professional with 4 years of hands-on expertise building robust, secure corporate networks. Enthusiastic champion for Linux, Firewalls, and Open-Source performance monitoring tools.
+                            </p>
+                            <div class="flex justify-center items-center gap-6 text-xs text-slate-400 font-mono bg-slate-900/60 p-3 rounded-xl border border-slate-800 max-w-md mx-auto">
+                                <span>📍 Noida, U.P.</span>
+                                <span>📧 aryanrai_it@proton.me</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 2: Objective & Experience Pillars -->
+                    <div class="slide flex flex-col justify-center" data-duration="8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                            <div class="space-y-4">
+                                <span class="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2 py-1 rounded border border-cyan-900">MISSION OBJECTIVE</span>
+                                <h3 class="text-2xl font-bold text-white">Dedicated to Engineering Scalability</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    "To express happiness through my work that will allow me to utilize my skills, experience and goodwill in making an organization successful and securing its digital perimeter."
+                                </p>
+                                <div class="p-4 bg-slate-900/80 border-l-4 border-cyan-500 rounded-r-xl space-y-1">
+                                    <h4 class="text-xs font-bold text-cyan-400 font-mono">Specialization Core</h4>
+                                    <p class="text-xs text-slate-400">Firewalls, Switching & Routing, Automated Performance Tuning, Deep Root Cause Analysis (RCA).</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800/80 space-y-4">
+                                <h4 class="text-sm font-bold text-white font-mono border-b border-slate-800 pb-2 flex items-center gap-2">
+                                    <i data-lucide="activity" class="text-green-400 w-4 h-4"></i> Professional Highlights
+                                </h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="h-5 w-5 rounded-full bg-cyan-950 flex items-center justify-center text-[10px] text-cyan-400 mt-0.5">✓</div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-slate-200">4+ Years Experience</p>
+                                            <p class="text-[11px] text-slate-400">Enterprise deployment and firewall migrations.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="h-5 w-5 rounded-full bg-cyan-950 flex items-center justify-center text-[10px] text-cyan-400 mt-0.5">✓</div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-slate-200">Linux Advocate</p>
+                                            <p class="text-[11px] text-slate-400">Advanced bash scripting, pen-testing, and server setup.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-2.5">
+                                        <div class="h-5 w-5 rounded-full bg-cyan-950 flex items-center justify-center text-[10px] text-cyan-400 mt-0.5">✓</div>
+                                        <div>
+                                            <p class="text-xs font-semibold text-slate-200">Network Telemetry</p>
+                                            <p class="text-[11px] text-slate-400">Zabbix, Nagios, OpManager dashboards built from scratch.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: Skills & Technology Matrix -->
+                    <div class="slide flex flex-col justify-center" data-duration="12">
+                        <div class="space-y-4 w-full">
+                            <div class="text-center">
+                                <span class="text-xs font-mono text-cyan-400">SYSTEM ARCHITECTURE MATRIX</span>
+                                <h3 class="text-2xl font-bold text-white">Technical & Tool Command</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                                    <div class="flex items-center gap-2 mb-2 text-cyan-400">
+                                        <i data-lucide="shield" class="w-4 h-4"></i>
+                                        <h4 class="text-xs font-mono font-bold uppercase">Security & Firewalls</h4>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">pfSense</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">FortiGate</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">Kali Linux</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">VPN (IPSec)</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">ACLs</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                                    <div class="flex items-center gap-2 mb-2 text-green-400">
+                                        <i data-lucide="shuffle" class="w-4 h-4"></i>
+                                        <h4 class="text-xs font-mono font-bold uppercase">Routing & Switching</h4>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">BGP</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">OSPF</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">VLANs</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">SD-WAN</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">MPLS</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                                    <div class="flex items-center gap-2 mb-2 text-yellow-400">
+                                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                                        <h4 class="text-xs font-mono font-bold uppercase">Admin & DevOps</h4>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">Ubuntu</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">Zabbix</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">Nagios</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">PowerShell</span>
+                                        <span class="text-[10px] bg-slate-950 px-2 py-1 rounded text-slate-300 border border-slate-800">GCP Cloud</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 flex flex-wrap justify-between items-center text-xs text-slate-400">
+                                <span class="flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-cyan-400"></i> Physical infra expertise:</span>
+                                <span class="font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded text-cyan-300">SFP modules</span>
+                                <span class="font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded text-cyan-300">Fiber termination</span>
+                                <span class="font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded text-cyan-300">Rack set-ups</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 4: Career Journey / Timeline -->
+                    <div class="slide flex flex-col justify-center" data-duration="10">
+                        <div class="space-y-4 w-full">
+                            <div class="text-center">
+                                <span class="text-xs font-mono text-cyan-400">PROFESSIONAL HISTORICAL ROUTING</span>
+                                <h3 class="text-2xl font-bold text-white">Career Milestones</h3>
+                            </div>
+                            
+                            <div class="space-y-3 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-800">
+                                
+                                <div class="relative pl-8">
+                                    <div class="absolute left-1.5 top-1.5 h-4 w-4 rounded-full bg-cyan-500 ring-4 ring-cyan-950"></div>
+                                    <div class="flex flex-wrap justify-between items-baseline">
+                                        <h4 class="text-sm font-bold text-white">Network Security Engineer <span class="text-cyan-400 font-normal">@ MapleCloud Technologies</span></h4>
+                                        <span class="text-xs font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">Present</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Leading firewall compliance frameworks, building clean high-fidelity network diagrams, and executing dynamic firewall and switch cut-overs.</p>
+                                </div>
+
+                                <div class="relative pl-8">
+                                    <div class="absolute left-1.5 top-1.5 h-4 w-4 rounded-full bg-slate-700 ring-4 ring-slate-950"></div>
+                                    <div class="flex flex-wrap justify-between items-baseline">
+                                        <h4 class="text-sm font-bold text-white">System Engineer <span class="text-slate-400 font-normal">@ Dainik Bhaskar</span></h4>
+                                        <span class="text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded">2024 - 2025</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Monitored Pan-India active telecommunication links, handled multi-branch VPN configurations, and successfully mitigated network outages.</p>
+                                </div>
+
+                                <div class="relative pl-8">
+                                    <div class="absolute left-1.5 top-1.5 h-4 w-4 rounded-full bg-slate-700 ring-4 ring-slate-950"></div>
+                                    <div class="flex flex-wrap justify-between items-baseline">
+                                        <h4 class="text-sm font-bold text-white">Network Engineer <span class="text-slate-400 font-normal">@ Ruchi Printers PVT LTD</span></h4>
+                                        <span class="text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded">2022 - 2024</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-1">Configured physical server racks, managed corporate switches/routers, updated IT assets, and resolved complex client-side layer-3 issues.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 5: Labs & Showcase Projects -->
+                    <div class="slide flex flex-col justify-center" data-duration="10">
+                        <div class="space-y-4 w-full">
+                            <div class="text-center">
+                                <span class="text-xs font-mono text-cyan-400">ENGINEERING LABORATORY INSIGHTS</span>
+                                <h3 class="text-2xl font-bold text-white">Real-world Hands-on Projects</h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-800/80 transition group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition">Fortigate Enterprise Lab</h4>
+                                        <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded">Hyper-V</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        Engineered a robust FortiGate firewall topology within Hyper-V, securely integrated with an LDAP Directory service, featuring strict policy enforcement.
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-800/80 transition group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition">Site-to-Site IPSec VPN</h4>
+                                        <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded">pfSense</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        Established encrypted Site-to-Site tunnel configurations with detailed Phase-1 & Phase-2 hashing, and cryptographic parameter fine-tuning.
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-800/80 transition group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition">Zabbix Telemetry Setup</h4>
+                                        <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded">Ubuntu / MySQL</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        Set up complete server telemetry from scratch. Customized database query polling and structured triggers for instant system notifications.
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 hover:border-cyan-800/80 transition group">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="text-sm font-bold text-white group-hover:text-cyan-400 transition">VLAN GNS3 Simulations</h4>
+                                        <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded">GNS3 / Qemu</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">
+                                        Built complex networking environments using actual hardware-based operating system images inside GNS3 to study packet headers and OSPF routing tables.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 6: Certifications & Communities -->
+                    <div class="slide flex flex-col justify-center" data-duration="8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center w-full">
+                            <div class="space-y-4">
+                                <span class="text-xs font-mono text-cyan-400">CREDENTIAL VERIFICATION</span>
+                                <h3 class="text-2xl font-bold text-white">Certificates & Hobbies</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 flex items-center gap-3">
+                                        <i data-lucide="award" class="text-yellow-400 w-8 h-8 flex-shrink-0"></i>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">Google IT Support Professional</p>
+                                            <p class="text-[11px] text-slate-400">Coursera Verified</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 flex items-center gap-3">
+                                        <i data-lucide="award" class="text-cyan-400 w-8 h-8 flex-shrink-0"></i>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">CCNA (Learn Vern Training)</p>
+                                            <p class="text-[11px] text-slate-400">Deep study of switching and routing mechanics</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 flex items-center gap-3">
+                                        <i data-lucide="shield-check" class="text-green-400 w-8 h-8 flex-shrink-0"></i>
+                                        <div>
+                                            <p class="text-xs font-bold text-white">Ethical Hacking Essentials</p>
+                                            <p class="text-[11px] text-slate-400">EC-Council Certification & Python</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800/80 space-y-4">
+                                <h4 class="text-sm font-bold text-white font-mono border-b border-slate-800 pb-2">Passions & Intellect</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Digital Privacy</span>
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Citizen Rights</span>
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Engineering Psychology</span>
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Open Source</span>
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Digital Physics</span>
+                                    <span class="text-[11px] bg-slate-950 px-2.5 py-1 rounded text-cyan-300 border border-slate-800/60">Yoga & Fitness</span>
+                                </div>
+                                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/50 space-y-1">
+                                    <p class="text-[10px] font-mono text-slate-400 uppercase">Tech Communities Joined:</p>
+                                    <p class="text-xs text-slate-300">Null Community, APNIC, Internet Society, IETF, IEEE</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 7: Contact & Interactive Call-to-Action -->
+                    <div class="slide flex flex-col justify-center" data-duration="10">
+                        <div class="max-w-xl mx-auto text-center space-y-5">
+                            <span class="text-xs font-mono text-green-400 bg-green-950/60 px-3 py-1 rounded-full border border-green-900">PING SUCCESSFUL - 0% PACKET LOSS</span>
+                            <h3 class="text-3xl font-extrabold text-white">Let's Establish a Connection</h3>
+                            <p class="text-slate-300 text-sm">
+                                Seeking challenging roles in Enterprise Network Setup, Cyber Defense, Firewall administration, and Cloud telemetry infrastructure. Available for immediate onboarding.
+                            </p>
+                            
+                            <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto pt-2">
+                                <a href="https://www.linkedin.com/in/aryanrai256" target="_blank" class="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-xs py-2 rounded-xl text-slate-200 hover:text-white transition">
+                                    <i data-lucide="linkedin" class="w-4 h-4 text-cyan-400"></i> LinkedIn
+                                </a>
+                                <a href="https://github.com/aryanrai256" target="_blank" class="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-xs py-2 rounded-xl text-slate-200 hover:text-white transition">
+                                    <i data-lucide="github" class="w-4 h-4 text-white"></i> GitHub
+                                </a>
+                            </div>
+
+                            <div class="border-t border-slate-850 pt-4 flex flex-col items-center space-y-1">
+                                <p class="text-xs text-slate-400 font-mono">Noida, Uttar Pradesh, India</p>
+                                <p class="text-xs text-cyan-400 font-bold font-mono">+91 6232667582, 9519693301</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Custom Video Controls Progress Bar -->
+                <div class="absolute bottom-[68px] left-0 right-0 h-1 bg-slate-800 cursor-pointer" id="progressBarContainer">
+                    <div class="h-full bg-gradient-to-r from-cyan-500 to-green-500 transition-all duration-100" id="videoProgressBar" style="width: 0%;"></div>
+                </div>
+
+                <!-- Video Controls Panel -->
+                <div class="p-4 bg-slate-950/95 border-t border-slate-900 flex justify-between items-center gap-4 relative z-20">
+                    <div class="flex items-center space-x-2">
+                        <button id="prevBtn" class="p-2 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Previous Frame">
+                            <i data-lucide="skip-back" class="w-5 h-5"></i>
+                        </button>
+                        <button id="playPauseBtn" class="p-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl transition shadow-lg shadow-cyan-950/50" title="Play / Pause Frame Sequence">
+                            <span id="playPauseIconContainer">
+                                <i data-lucide="pause" class="w-5 h-5"></i>
+                            </span>
+                        </button>
+                        <button id="nextBtn" class="p-2 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Next Frame">
+                            <i data-lucide="skip-forward" class="w-5 h-5"></i>
+                        </button>
+                        <button id="restartBtn" class="p-2 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Restart Presentation">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <div class="text-xs text-slate-400 font-mono hidden sm:block">
+                        Scene <span id="currentFrameNum" class="text-white font-bold">1</span> / <span id="totalFramesNum" class="text-slate-500">7</span>
+                    </div>
+
+                    <!-- Speed & Sound Configs -->
+                    <div class="flex items-center space-x-3">
+                        <select id="videoSpeedSelect" class="bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300 rounded px-2.5 py-1.5 focus:outline-none focus:border-cyan-700">
+                            <option value="0.75">0.75x Slow</option>
+                            <option value="1.0" selected>1.0x Normal</option>
+                            <option value="1.5">1.5x Fast</option>
+                            <option value="2.0">2.0x Hyper</option>
+                        </select>
+                        <button id="fullscreenBtn" class="p-2 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Toggle Fullscreen Mode">
+                            <i data-lucide="maximize" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer with prompt information and interactive ping terminal -->
+    <footer class="relative z-20 px-6 py-4 border-t border-slate-800/60 glass-panel flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+        <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-cyan-400"></span> Live Node Status</span>
+            <span class="text-slate-600">|</span>
+            <span class="mono text-[11px]">PING 127.0.0.1 (localhost) 56(84) bytes of data.</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="mono text-[11px] text-green-400">64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.04 ms</span>
+            <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-slate-700 font-mono px-3 py-1 rounded transition text-[11px] flex items-center gap-1">
+                <i data-lucide="printer" class="w-3 h-3"></i> Export PDF Resume
+            </button>
+        </div>
+    </footer>
+
+    <!-- Interactive JS logic -->
+    <script>
+        // Init Lucide Icons
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // Resume Section Titles for playlist display
+        const sectionTitles = [
+            "Aryan Rai Overview",
+            "Objective & Pillars",
+            "Technical Matrix",
+            "Career Timeline",
+            "Projects & Labs",
+            "Certificates & Hobbies",
+            "Connection Gateway"
+        ];
+
+        // Slide State Management
+        let slides = document.querySelectorAll('.slide');
+        let currentSlideIndex = 0;
+        let isPlaying = true;
+        let timer = null;
+        let durationLeft = 0;
+        let totalDurationForSlide = 0;
+        let speedMultiplier = 1.0;
+        let globalTimerSeconds = 0;
+        let globalTimerInterval = null;
+
+        // Sound System Web Audio API
+        let audioCtx = null;
+        let mainVolumeNode = null;
+        let isMusicPlaying = false;
+        let soundInterval = null;
+        let analyser = null;
+        let dataArray = [];
+        let bufferLength = 0;
+
+        // Canvas Background & Visualizer
+        const netCanvas = document.getElementById('networkCanvas');
+        const netCtx = netCanvas.getContext('2d');
+        const visCanvas = document.getElementById('visualizerCanvas');
+        const visCtx = visCanvas.getContext('2d');
+
+        // Helper function to safely change Lucide Icons inside dynamic elements
+        function setIcon(containerId, iconName, classes = "") {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `<i data-lucide="${iconName}" class="${classes}"></i>`;
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }
+        }
+
+        // Setup Visual Elements on DOM load
+        window.addEventListener('load', () => {
+            initPlaylist();
+            resizeCanvas();
+            animateBackgroundNetwork();
+            loadSlide(0);
+            startGlobalTimer();
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+
+        // Setup Playlist elements in sidebar
+        function initPlaylist() {
+            const playlist = document.getElementById('playlistContainer');
+            playlist.innerHTML = '';
+            sectionTitles.forEach((title, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-2.5 rounded-lg border text-xs font-medium transition flex items-center justify-between ${idx === 0 ? 'bg-cyan-950/40 border-cyan-800 text-cyan-300' : 'bg-transparent border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200'}`;
+                btn.id = `playlist-item-${idx}`;
+                btn.onclick = () => {
+                    jumpToSlide(idx);
+                };
+                
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="mono text-[10px] text-slate-500">0${idx+1}</span>
+                        <span class="truncate">${title}</span>
+                    </div>
+                    <span id="playlist-icon-container-${idx}" class="transition-opacity duration-300 opacity-0">
+                        <i data-lucide="play" class="w-3 h-3 text-cyan-500"></i>
+                    </span>
+                `;
+                playlist.appendChild(btn);
+            });
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+            updatePlaylistActiveState();
+        }
+
+        function updatePlaylistActiveState() {
+            sectionTitles.forEach((_, idx) => {
+                const btn = document.getElementById(`playlist-item-${idx}`);
+                if (!btn) return;
+                const iconContainer = document.getElementById(`playlist-icon-container-${idx}`);
+                if (idx === currentSlideIndex) {
+                    btn.className = "w-full text-left p-2.5 rounded-lg border text-xs font-medium transition flex items-center justify-between bg-cyan-950/40 border-cyan-800 text-cyan-300 glow-cyan";
+                    if (iconContainer) iconContainer.classList.remove('opacity-0');
+                } else {
+                    btn.className = "w-full text-left p-2.5 rounded-lg border text-xs font-medium transition flex items-center justify-between bg-transparent border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200";
+                    if (iconContainer) iconContainer.classList.add('opacity-0');
+                }
+            });
+        }
+
+        // Slide Progression Engine
+        function loadSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'exit');
+                if (i === index) {
+                    slide.classList.add('active');
+                } else if (i === currentSlideIndex) {
+                    slide.classList.add('exit');
+                }
+            });
+
+            currentSlideIndex = index;
+            document.getElementById('currentFrameNum').textContent = index + 1;
+            document.getElementById('totalFramesNum').textContent = slides.length;
+            
+            updatePlaylistActiveState();
+
+            // Set times based on slide specification
+            const durationAttr = parseInt(slides[index].getAttribute('data-duration')) || 8;
+            totalDurationForSlide = durationAttr * 1000;
+            durationLeft = totalDurationForSlide;
+
+            if (isPlaying) {
+                resetSlideTimer();
+            }
+        }
+
+        function resetSlideTimer() {
+            if (timer) clearInterval(timer);
+            const tickRate = 50; // ms
+            timer = setInterval(() => {
+                if (!isPlaying) return;
+                durationLeft -= tickRate * speedMultiplier;
+                
+                // Update progress bar
+                const percentage = ((totalDurationForSlide - durationLeft) / totalDurationForSlide) * 100;
+                document.getElementById('videoProgressBar').style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+
+                if (durationLeft <= 0) {
+                    nextSlide();
+                }
+            }, tickRate);
+        }
+
+        function nextSlide() {
+            let nextIdx = currentSlideIndex + 1;
+            if (nextIdx >= slides.length) {
+                nextIdx = 0; // loop
+            }
+            loadSlide(nextIdx);
+        }
+
+        function prevSlide() {
+            let prevIdx = currentSlideIndex - 1;
+            if (prevIdx < 0) {
+                prevIdx = slides.length - 1;
+            }
+            loadSlide(prevIdx);
+        }
+
+        function jumpToSlide(index) {
+            loadSlide(index);
+        }
+
+        // Global Timer Tick
+        function startGlobalTimer() {
+            if (globalTimerInterval) clearInterval(globalTimerInterval);
+            globalTimerInterval = setInterval(() => {
+                if (isPlaying) {
+                    globalTimerSeconds++;
+                    const minutes = Math.floor(globalTimerSeconds / 60).toString().padStart(2, '0');
+                    const seconds = (globalTimerSeconds % 60).toString().padStart(2, '0');
+                    document.getElementById('videoDurationTimer').textContent = `${minutes}:${seconds}`;
+                }
+            }, 1000);
+        }
+
+        // Control Panel Listeners
+        document.getElementById('playPauseBtn').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                setIcon('playPauseIconContainer', 'pause', 'w-5 h-5');
+                resetSlideTimer();
+            } else {
+                setIcon('playPauseIconContainer', 'play', 'w-5 h-5');
+                if (timer) clearInterval(timer);
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            globalTimerSeconds = 0;
+            document.getElementById('videoDurationTimer').textContent = "00:00";
+            loadSlide(0);
+        });
+
+        document.getElementById('videoSpeedSelect').addEventListener('change', (e) => {
+            speedMultiplier = parseFloat(e.target.value);
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            const playerSpace = document.querySelector('.lg\\:col-span-3');
+            if (!document.fullscreenElement) {
+                playerSpace.requestFullscreen().catch(err => {
+                    console.log("Error enabling fullscreen", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Click on progress bar to jump inside current slide
+        document.getElementById('progressBarContainer').addEventListener('click', (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            durationLeft = totalDurationForSlide * (1 - percentage);
+            document.getElementById('videoProgressBar').style.width = `${percentage * 100}%`;
+        });
+
+
+        // ==========================================
+        // SYNTHESIZER (Web Audio Ambient Music Gen)
+        // ==========================================
+        function initSynth() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                mainVolumeNode = audioCtx.createGain();
+                mainVolumeNode.gain.value = parseFloat(document.getElementById('volumeSlider').value);
+
+                // Analyser for visualizer
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+
+                mainVolumeNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            } catch (err) {
+                console.error("Synthesizer failed to load:", err);
+            }
+        }
+
+        // Simple Pentatonic Progression Generator (Procedural Ambient Loop)
+        const notes = [
+            220.00, // A3
+            261.63, // C4
+            293.66, // D4
+            329.63, // E4
+            392.00, // G4
+            440.00, // A4
+            523.25, // C5
+            587.33  // D5
+        ];
+
+        function playAmbientBeep(time, note, type = 'sine', duration = 1.5, vol = 0.15) {
+            if (!audioCtx || !mainVolumeNode) return;
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(note, time);
+
+            // Volume Envelope
+            gainNode.gain.setValueAtTime(0, time);
+            gainNode.gain.linearRampToValueAtTime(vol, time + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+            osc.connect(gainNode);
+            gainNode.connect(mainVolumeNode);
+
+            osc.start(time);
+            osc.stop(time + duration);
+        }
+
+        let stepCount = 0;
+        function runMusicScheduler() {
+            if (!isMusicPlaying) return;
+
+            const now = audioCtx.currentTime;
+            
+            // Generate a dreamy progression
+            // Step chord basis
+            if (stepCount % 8 === 0) {
+                // Ground Pad Chord A3, E4, A4
+                playAmbientBeep(now, 110.00, 'sawtooth', 4.0, 0.05); // A2 Deep bass
+                playAmbientBeep(now + 0.1, 220.00, 'sine', 3.5, 0.12);
+                playAmbientBeep(now + 0.2, 329.63, 'sine', 3.5, 0.08);
+            } else if (stepCount % 8 === 4) {
+                // Shift to C or G
+                playAmbientBeep(now, 130.81, 'sawtooth', 4.0, 0.05); // C3 Deep bass
+                playAmbientBeep(now + 0.1, 261.63, 'sine', 3.5, 0.12);
+                playAmbientBeep(now + 0.2, 392.00, 'sine', 3.5, 0.08);
+            }
+
+            // Casual melodic bells
+            if (Math.random() > 0.3) {
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                playAmbientBeep(now + 0.4, randomNote, 'triangle', 2.0, 0.07);
+            }
+            if (Math.random() > 0.6) {
+                const secondaryNote = notes[Math.floor(Math.random() * notes.length)] * 2; // high oct
+                playAmbientBeep(now + 0.8, secondaryNote, 'sine', 1.0, 0.04);
+            }
+
+            stepCount++;
+            
+            // Loop beat (every 1000ms)
+            soundInterval = setTimeout(runMusicScheduler, 1000);
+        }
+
+        // Toggle Sound Engine Play/Stop
+        const toggleBtn = document.getElementById('toggleSynthBtn');
+        toggleBtn.addEventListener('click', () => {
+            if (!audioCtx) {
+                initSynth();
+            }
+
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isMusicPlaying = !isMusicPlaying;
+            
+            if (isMusicPlaying) {
+                setIcon('toggleSynthIconContainer', 'square', 'w-3.5 h-3.5');
+                document.getElementById('toggleSynthText').textContent = "Stop Music";
+                document.getElementById('synthStatusText').textContent = "Broadcasting Ambient Audio...";
+                document.getElementById('synthStatusText').className = "text-xs font-bold text-cyan-400 font-mono animate-pulse";
+                runMusicScheduler();
+                drawVisualizer();
+            } else {
+                setIcon('toggleSynthIconContainer', 'play', 'w-3.5 h-3.5');
+                document.getElementById('toggleSynthText').textContent = "Play Music";
+                document.getElementById('synthStatusText').textContent = "Audio Muted / Paused";
+                document.getElementById('synthStatusText').className = "text-xs font-bold text-slate-500 font-mono";
+                if (soundInterval) clearTimeout(soundInterval);
+            }
+        });
+
+        // Volume Change Listener
+        document.getElementById('volumeSlider').addEventListener('input', (e) => {
+            if (mainVolumeNode) {
+                mainVolumeNode.gain.value = parseFloat(e.target.value);
+            }
+        });
+
+
+        // ==========================================
+        // GRAPHICS & ANIMATIONS
+        // ==========================================
+
+        // 1. Dynamic Audio Visualizer
+        function drawVisualizer() {
+            if (!isMusicPlaying || !analyser) {
+                // Draw flat line when quiet
+                visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+                visCtx.beginPath();
+                visCtx.moveTo(0, visCanvas.height / 2);
+                visCtx.lineTo(visCanvas.width, visCanvas.height / 2);
+                visCtx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+                visCtx.lineWidth = 2;
+                visCtx.stroke();
+                return;
+            }
+
+            requestAnimationFrame(drawVisualizer);
+            analyser.getByteFrequencyData(dataArray);
+
+            visCtx.fillStyle = 'rgba(11, 15, 25, 0.4)';
+            visCtx.fillRect(0, 0, visCanvas.width, visCanvas.height);
+
+            const barWidth = (visCanvas.width / bufferLength) * 1.5;
+            let barHeight;
+            let x = 0;
+
+            for(let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 4;
+
+                // Color gradient based on frequency
+                const g = visCtx.createLinearGradient(0, 0, 0, visCanvas.height);
+                g.addColorStop(0, '#22c55e'); // Green peaks
+                g.addColorStop(0.5, '#06b6d4'); // Cyan mid
+                g.addColorStop(1, '#1e293b'); // Dark blue bottoms
+
+                visCtx.fillStyle = g;
+                visCtx.fillRect(x, visCanvas.height - barHeight, barWidth - 1, barHeight);
+
+                x += barWidth;
+            }
+        }
+
+        // 2. Network Node Connection Simulator (Background Graphics)
+        let nodes = [];
+        const maxNodes = 40;
+
+        function resizeCanvas() {
+            netCanvas.width = window.innerWidth;
+            netCanvas.height = window.innerHeight;
+
+            // Set visualizer canvas height & width dynamically to prevent blurry graphics
+            if (visCanvas && visCanvas.parentElement) {
+                visCanvas.width = visCanvas.parentElement.clientWidth;
+                visCanvas.height = 48; // Aligning with the class style height-12
+            }
+            
+            // Redraw or spawn fresh nodes
+            nodes = [];
+            for (let i = 0; i < maxNodes; i++) {
+                nodes.push({
+                    x: Math.random() * netCanvas.width,
+                    y: Math.random() * netCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 2 + 1,
+                    pingPulse: Math.random() * 10
+                });
+            }
+        }
+
+        function animateBackgroundNetwork() {
+            requestAnimationFrame(animateBackgroundNetwork);
+            netCtx.clearRect(0, 0, netCanvas.width, netCanvas.height);
+
+            // Draw Paths between nodes if they are close (Router connectivity representation)
+            for (let i = 0; i < nodes.length; i++) {
+                let n1 = nodes[i];
+                
+                // Update position
+                n1.x += n1.vx;
+                n1.y += n1.vy;
+
+                // Bounce walls
+                if (n1.x < 0 || n1.x > netCanvas.width) n1.vx *= -1;
+                if (n1.y < 0 || n1.y > netCanvas.height) n1.vy *= -1;
+
+                // Draw pulsing connection circles
+                n1.pingPulse += 0.05;
+                if (n1.pingPulse > 30) n1.pingPulse = 0;
+
+                netCtx.beginPath();
+                netCtx.arc(n1.x, n1.y, n1.radius + (n1.pingPulse < 10 ? n1.pingPulse / 2 : 0), 0, Math.PI * 2);
+                netCtx.fillStyle = 'rgba(6, 182, 212, 0.15)';
+                netCtx.fill();
+
+                // Check link connectivity
+                for (let j = i + 1; j < nodes.length; j++) {
+                    let n2 = nodes[j];
+                    let dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
+                    
+                    if (dist < 120) {
+                        netCtx.beginPath();
+                        netCtx.moveTo(n1.x, n1.y);
+                        netCtx.lineTo(n2.x, n2.y);
+                        // Gradient connection opacity
+                        netCtx.strokeStyle = `rgba(34, 197, 94, ${0.15 * (1 - dist / 120)})`;
+                        netCtx.lineWidth = 0.8;
+                        netCtx.stroke();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
