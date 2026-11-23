@@ -127,16 +127,18 @@
 						<div class="col-sm-6">
 							<div class="single-about-txt">
 								<h3>
-									Result-driven IT engineer with 3 years of experience in windows & network troubleshooting. 
+									Results-driven IT engineer with 3 years of experience in windows &amp; network troubleshooting. 
 								</h3>
 								<p>
-									Skilled in network design, network security, and optimizing performance. Adept at configuring firewalls,routers, and switches to ensure seamless connectivity. Have great passion for Open Source. Seeking an opportunity to contribute exertise in a dynamic IT environment.
+									Skilled in network design, network security, and optimizing performance. Adept at configuring firewalls,routers, and switches to ensure seamless connectivity. Have great passion for Open Source. Seeking an opportunity to contribute expertise in a dynamic IT environment.
 								</p>
 								<div class="row">
 									<div class="col-sm-4">
 										<div class="single-about-add-info">
 											<h3>phone</h3>
-											<p>6232667582</p>
+											<p class="phone-reveal-slot">
+												<button type="button" class="reveal-phone-btn" onclick="revealPhoneNumbers()" style="background:none;border:none;padding:0;color:inherit;text-decoration:underline;cursor:pointer;">Show number</button>
+											</p>
 										</div>
 									</div>
 									<div class="col-sm-4">
@@ -252,7 +254,7 @@
 							<div class="single-horizontal-timeline">
 								<div class="experience-time">
 									<h2>2016 - 2020</h2>
-									<h3>bachelor <span>of </span> Computer science & engineering</h3>
+									<h3>Bachelor <span>of </span> Computer Science &amp; Engineering</h3>
 								</div><!--/.experience-time-->
 								<div class="timeline-horizontal-border">
 									<i class="fa fa-circle" aria-hidden="true"></i>
@@ -262,7 +264,7 @@
 								<div class="timeline">
 									<div class="timeline-content">
 										<h4 class="title">
-											Moradabad college of engineering & technology
+											Moradabad college of engineering &amp; technology
 										</h4>
 										<h5>Moradabad (U.P.)</h5>
 									</div><!--/.timeline-content-->
@@ -309,7 +311,7 @@
 										</div>
 									</div><!-- /.barWrapper -->
 									<div class="barWrapper">
-										<span class="progressText">Routing & Switching</span>
+										<span class="progressText">Routing &amp; Switching</span>
 										<div class="single-progress-txt">
 											<div class="progress ">
 											   <div class="progress-bar" role="progressbar" aria-valuenow="97" aria-valuemin="10" aria-valuemax="100" style="">
@@ -320,7 +322,7 @@
 										</div>
 									</div><!-- /.barWrapper -->
 									<div class="barWrapper">
-										<span class="progressText">AI Tools (ChatGPT & others)</span>
+										<span class="progressText">AI Tools (ChatGPT &amp; others)</span>
 										<div class="single-progress-txt">
 											<div class="progress ">
 											   <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="10" aria-valuemax="100" style="">
@@ -357,7 +359,7 @@
 										</div>
 									</div><!-- /.barWrapper -->
 									<div class="barWrapper">
-										<span class="progressText">english communication</span>
+										<span class="progressText">English communication</span>
 										<div class="single-progress-txt">
 											<div class="progress ">
 											   <div class="progress-bar" role="progressbar" aria-valuenow="97" aria-valuemin="10" aria-valuemax="100" style="">
@@ -454,7 +456,10 @@
 										</div>
 									</div><!--/.single-timeline-box-->
 								</li>
-			</div>
+							</ul>
+						</div>
+					</div>
+				</div>
 
 		</section><!--/.experience-->
 		<!--experience end -->
@@ -585,7 +590,9 @@
 									<div class="contact-add-info">
 										<div class="single-contact-add-info">
 											<h3>phone</h3>
-											<p>6232667582</p>
+											<p class="phone-reveal-slot">
+												<button type="button" class="reveal-phone-btn" onclick="revealPhoneNumbers()" style="background:none;border:none;padding:0;color:inherit;text-decoration:underline;cursor:pointer;">Show number</button>
+											</p>
 										</div>
 										<div class="single-contact-add-info">
 											<h3>email</h3>
@@ -634,6 +641,18 @@
 			
         </footer><!--/.footer-copyright-->
 		<!--footer-copyright end-->
+
+		<script>
+			function revealPhoneNumbers() {
+				const a = "623";
+				const b = "266";
+				const c = "7582";
+				const fullNumber = a + b + c;
+				document.querySelectorAll(".phone-reveal-slot").forEach(function (el) {
+					el.innerHTML = '<a href="tel:' + fullNumber + '">' + fullNumber + '</a>';
+				});
+			}
+		</script>
 		
 		<!-- Include all js compiled plugins (below), or include individual files as needed -->
 
